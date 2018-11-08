@@ -128,7 +128,7 @@ public class MazeGenerator {
 		private String character = " ";
 		private int color = WHITE;
 		private boolean intactWalls = true;
-		public LinkedList<Cell> neighbors = new LinkedList<Cell>();
+		public LinkedList<Cell> neighbors;
 		public static final int WHITE = 0;
 		public static final int GREY = 1;
 		public static final int BLACK = 2;
@@ -136,6 +136,7 @@ public class MazeGenerator {
 		public Cell(int x, int y) {
 			this.x = x;
 			this.y = y;
+			neighbors = new LinkedList<Cell>();
 		}
 
 		public void addEdge(Cell c) {
