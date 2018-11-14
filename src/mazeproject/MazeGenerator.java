@@ -25,7 +25,7 @@ public class MazeGenerator {
 		Stack<Cell> cellStack = new Stack<Cell>();
 		ArrayList<Cell> intactCells = new ArrayList<Cell>();
 		int totalCells = cellCount;
-		Cell currentCell = cells[0][0];
+		Cell currentCell = cells[0][0];//how does this even work with our testing stuff
 		int visitedCells = 1;
 		while (visitedCells < totalCells) {
 			for (Cell c : currentCell.neighbors) {
