@@ -9,7 +9,9 @@ class MazeGeneratorTest {
 	@Test
 	void test() {
 		MazeGenerator mg = new MazeGenerator(5);
-		mg.createPath(4);
+		mg.initializeCells();
+		
+		
 		MazeGenerator mg2 = new MazeGenerator(8);
 	}
 

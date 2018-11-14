@@ -1,6 +1,5 @@
 package mazeproject;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
@@ -21,114 +20,121 @@ public class MazeGenerator {
 		grid = new String[dimension_in][dimension_in];
 		gridlength = ((dimension_in * 2) + 1);
 		cellCount = dimension_in * dimension_in;
-		myRandGen = new java.util.Random(dimension_in);
-		Stack<Cell> cellStack = new Stack<Cell>();
-		ArrayList<Cell> intactCells = new ArrayList<Cell>();
-		int totalCells = cellCount;
-		Cell currentCell = cells[0][0];//how does this even work with our testing stuff
-		int visitedCells = 1;
-		while (visitedCells < totalCells) {
-			for (Cell c : currentCell.neighbors) {
-				if (c.intactWalls) {
-					intactCells.add(c);
-				}
-				if (intactCells.size() > 0) {
-					int j = (int) (myrandom() * intactCells.size());
-					intactCells.remove(j);
-					cellStack.push(currentCell);
-					currentCell = c;
-					visitedCells++;
-				} else {
-
-					currentCell = cellStack.pop();
-				}
-			}
-
-		} /**
-			 * cellCount = r * r; grid = new char[(r * 2) + 1][(r * 2) + 1]; cells = new
-			 * Cell[r][r]; for (int i = 0; i < r; i++) { System.out.println(""); for (int j
-			 * = 0; j < r; j++) { System.out.print(j); cells[i][j] = new Cell(i, j); } } for
-			 * (int i = 0; i < r; i++) { for (int j = 0; j < r; j++) { if (j < r - 1) {
-			 * cells[i][j].addEdge(cells[i][j + 1]);// figure out why this doesnt go thru }
-			 * if (i < r - 1) { cells[i][j].addEdge(cells[i + 1][j]); }
-			 * 
-			 * }
-			 * 
-			 * } System.out.println(""); for (int l = 0; l < r; l++) { for (int i = 0; i <
-			 * r; i++) { System.out.print(cells[l][i].x); System.out.print(cells[l][i].y);
-			 * System.out.print(" "); } System.out.println(" "); } for (int l = 0; l < r;
-			 * l++) { for (int i = 0; i < r; i++) { System.out.print("+");
-			 * System.out.print("-"); } System.out.println("+"); for (int i = 0; i < r; i++)
-			 * { System.out.print("|"); System.out.print(" "); } System.out.print("|");
-			 * System.out.println(""); } for (int i = 0; i <= r; i++) {
-			 * System.out.print("+"); if (i < r) { System.out.print("-"); } }
-			 **/
+		myRandGen = new java.util.Random(0);
+		cells = new Cell[dimension_in][dimension_in];
 
 	}
-	
+
 	public String[][] maze(int mazeSize) {
 		int n = 2 * mazeSize + 1;
 		int m = 2 * mazeSize + 1;
 		String[][] grid = new String[n][m];
-		
-		for(int rowIndex = 0; rowIndex < n; rowIndex++) {
-			for(int colIndex = 0; colIndex < m; colIndex++) {
-				if(rowIndex == 0 && colIndex == 1) {
-					grid[rowIndex][colIndex] = "S"; //Start
+
+		for (int rowIndex = 0; rowIndex < n; rowIndex++) {
+			for (int colIndex = 0; colIndex < m; colIndex++) {
+				if (rowIndex == 0 && colIndex == 1) {
+					grid[rowIndex][colIndex] = "S"; // Start
+				} else if (rowIndex == 2 * mazeSize - 1 && colIndex == 2 * mazeSize) {
+					grid[rowIndex][colIndex] = "E"; // End
 				}
-				else if(rowIndex == 2 * mazeSize - 1 && colIndex == 2 * mazeSize) {
-					grid[rowIndex][colIndex] = "E"; //End
-				}
-				//evens
-				else if(rowIndex % 2 == 0) {
-					if(colIndex % 2 == 0) {
+				// evens
+				else if (rowIndex % 2 == 0) {
+					if (colIndex % 2 == 0) {
 						grid[rowIndex][colIndex] = "+";
-					}
-					else {
+					} else {
 						grid[rowIndex][colIndex] = "|";
 					}
 				}
-				//odds
+				// odds
 				else {
-					if(colIndex % 2 == 0) {
+					if (colIndex % 2 == 0) {
 						grid[rowIndex][colIndex] = "-";
-					}
-					else {
+					} else {
 						grid[rowIndex][colIndex] = "0";
 					}
 				}
 			}
 		}
-		
-		Stack<Cell> cellStack = new Stack<Cell>();
-		int totalCells = cellCount;
-		int visitedCells = 1;
-		Cell current = new Cell(0, 0);
-		while (visitedCells < totalCells) {
-			int j = (int) (myrandom() * current.neighbors.size() - 1);
-			current = path(grid, current, j);
-			visitedCells = visitedCells + 1;
-			cellStack.push(current);
-		}
-		return grid;
-	}
-	
-	/**
 
-	public String[][] generate(String[][] grid) {
 		Stack<Cell> cellStack = new Stack<Cell>();
 		int totalCells = cellCount;
 		int visitedCells = 1;
 		Cell current = new Cell(0, 0);
 		while (visitedCells < totalCells) {
-			int j = (int) (myrandom() * current.neighbors.size() -1);
-			current = path(grid, current, j);
-			visitedCells = visitedCells + 1;
-			cellStack.push(current);
+			ArrayList<Cell> intactCells = new ArrayList<Cell>();
+			for (Cell c : current.neighbors) {
+				if (c.intactWalls) {
+					intactCells.add(c);// adds intactCells to the arrayList
+				}
+			}
+			if (intactCells.size() > 1) {
+				int j = (int) (myrandom() * intactCells.size());// chooses a random cell from intact neighbors
+				Cell toKnock = intactCells.get(j);
+				knockWall(current, toKnock);// knock down wall between current and toKnock
+				current = toKnock; // current cell is now the one that just had its walls knocked down
+				visitedCells++;
+			} else {
+				current = cellStack.pop(); // pop most recent cell and make it the current cell
+			}
 		}
 		return grid;
 	}
-	*/
+
+	public void knockWall(Cell current, Cell next) {
+		if (next.x > current.x) {
+			// knock down left wall of next
+		}
+		if (next.x < current.x) {
+			// knock down right wall of next
+		}
+		if (next.y < current.y) {
+			// knock down bottom wall of next
+		}
+		if (next.y > current.y) {
+			// knock down top wall of next
+		}
+	}
+
+	public void findNeighbors() {
+		for (int i = 0; i <= grid.length - 1; i++) {
+
+			for (int j = 0; j <= grid.length - 1; j++) {
+				if (j != grid.length - 1) {
+					cells[i][j].addEdge(cells[i][j + 1]);
+				}
+				if (i != grid.length - 1) {
+					cells[i][j].addEdge(cells[i + 1][j]);
+				}
+			}
+		}
+	}
+
+	public void initializeCells() {
+		for (int i = 0; i <= grid.length - 1; i++) {
+
+			for (int j = 0; j <= grid.length - 1; j++) {
+				cells[i][j] = new Cell(i, j);
+
+			}
+		}
+		findNeighbors();
+	}
+
+	/**
+	 * 
+	 * public String[][] generate(String[][] grid) { Stack<Cell> cellStack = new
+	 * Stack<Cell>(); int totalCells = cellCount; int visitedCells = 1; Cell current
+	 * = new Cell(0, 0); while (visitedCells < totalCells) { int j = (int)
+	 * (myrandom() * current.neighbors.size() -1); current = path(grid, current, j);
+	 * visitedCells = visitedCells + 1; cellStack.push(current); } return grid; }
+	 */
+	public int test() {
+		int j = (int) (myrandom() * 2);
+		System.out.println(j);
+		j = (int) (myrandom() * 4);
+		System.out.println(j);
+		return j;
+	}
 
 	public boolean intact(Cell c) {
 		if (grid[c.x][c.y].equals("#")) {
@@ -226,7 +232,7 @@ public class MazeGenerator {
 		private boolean intactWalls = true;
 		public LinkedList<Cell> neighbors;
 
-		public Cell(int x, int y) {
+		public Cell(int y, int x) {
 			this.x = x;
 			this.y = y;
 			neighbors = new LinkedList<Cell>();
@@ -244,6 +250,7 @@ public class MazeGenerator {
 
 		public void setNextCell(Cell node) {
 			this.node = node;
+			neighbors.add(node);
 		}
 
 		public Cell getNext() {
