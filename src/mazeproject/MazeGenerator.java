@@ -66,14 +66,25 @@ public class MazeGenerator {
 
 	}
 
-	public char[][] generate(char[][] grid) {
+	public String[][] generate(String[][] grid) {
 		Stack<Cell> cellStack = new Stack<Cell>();
 		int totalCells = cellCount;
 		int visitedCells = 1;
 		Cell current = new Cell(0, 0);
 		while (visitedCells < totalCells) {
-			int j = (int) (myrandom() * intactCells.size());
+			int j = (int) (myrandom() * current.neighbors.size() -1);
+			current = path(grid, current, j);
+			visitedCells = visitedCells + 1;
+			cellStack.push(current);
 		}
+		return grid;
+	}
+
+	public boolean intact(Cell c) {
+		if (grid[c.x][c.y].equals("#")) {
+			return false;
+		}
+		return true;
 	}
 
 	public Cell path(String[][] grid, Cell current, int random) {
@@ -93,11 +104,11 @@ public class MazeGenerator {
 			current = current.getNext();
 			grid[2 * (current.y + 2)][2 * (current.x + 1)] = "#";
 			grid[2 * (current.y + 1)][2 * (current.x + 1)] = "#";
-		} else if (random == 4) { //go left and delete right wall from left cell
+		} else if (random == 4) { // go left and delete right wall from left cell
 			current.setNextCell(new Cell(current.x - 1, current.y));
 			current = current.getNext();
-			grid[2 * (current.y + 1)][2 * (current.x +2)] = "#";
-			grid[2*(current.y+1)][2*(current.x+1)] = "#";
+			grid[2 * (current.y + 1)][2 * (current.x + 2)] = "#";
+			grid[2 * (current.y + 1)][2 * (current.x + 1)] = "#";
 		}
 		return current;
 
