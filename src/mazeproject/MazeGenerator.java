@@ -65,6 +65,55 @@ public class MazeGenerator {
 			 **/
 
 	}
+	
+	public String[][] maze(int mazeSize) {
+		int n = 2 * mazeSize + 1;
+		int m = 2 * mazeSize + 1;
+		String[][] grid = new String[n][m];
+		
+		for(int rowIndex = 0; rowIndex < n; rowIndex++) {
+			for(int colIndex = 0; colIndex < m; colIndex++) {
+				if(rowIndex == 0 && colIndex == 1) {
+					grid[rowIndex][colIndex] = "S"; //Start
+				}
+				else if(rowIndex == 2 * mazeSize - 1 && colIndex == 2 * mazeSize) {
+					grid[rowIndex][colIndex] = "E"; //End
+				}
+				//evens
+				else if(rowIndex % 2 == 0) {
+					if(colIndex % 2 == 0) {
+						grid[rowIndex][colIndex] = "+";
+					}
+					else {
+						grid[rowIndex][colIndex] = "|";
+					}
+				}
+				//odds
+				else {
+					if(colIndex % 2 == 0) {
+						grid[rowIndex][colIndex] = "-";
+					}
+					else {
+						grid[rowIndex][colIndex] = "0";
+					}
+				}
+			}
+		}
+		
+		Stack<Cell> cellStack = new Stack<Cell>();
+		int totalCells = cellCount;
+		int visitedCells = 1;
+		Cell current = new Cell(0, 0);
+		while (visitedCells < totalCells) {
+			int j = (int) (myrandom() * current.neighbors.size() - 1);
+			current = path(grid, current, j);
+			visitedCells = visitedCells + 1;
+			cellStack.push(current);
+		}
+		return grid;
+	}
+	
+	/**
 
 	public String[][] generate(String[][] grid) {
 		Stack<Cell> cellStack = new Stack<Cell>();
@@ -79,6 +128,7 @@ public class MazeGenerator {
 		}
 		return grid;
 	}
+	*/
 
 	public boolean intact(Cell c) {
 		if (grid[c.x][c.y].equals("#")) {
