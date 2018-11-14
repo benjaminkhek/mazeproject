@@ -79,7 +79,7 @@ public class MazeGenerator {
 	public Cell path(String[][] grid, Cell current, int random) {
 		grid[1][1] = "#";
 		if(random == 1) {//go down
-			current.setNextCell(new Cell(current.x, current.y-1));
+			current.setNextCell();
 		}
 
 	public void createPath(int r) {
