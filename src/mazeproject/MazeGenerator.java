@@ -78,9 +78,30 @@ public class MazeGenerator {
 
 	public Cell path(String[][] grid, Cell current, int random) {
 		grid[1][1] = "#";
-		if(random == 1) {//go down
-			current.setNextCell();
+		if (random == 1) {// go down and delete top wall from cell below
+			current.setNextCell(new Cell(current.x, current.y + 1));
+			current = current.getNext();
+			grid[2 * (current.y)][2 * (current.x + 1)] = "#";
+		} else if (random == 2)// go right and delete left wall from cell to the right
+		{
+			current.setNextCell(new Cell(current.x + 1, current.y));
+			current = current.getNext();
+			grid[2 * (current.y + 1)][2 * current.x] = "#";
+			grid[2 * (current.y + 1)][2 * (current.x + 1)] = "#";
+		} else if (random == 3) {// go up and delete bottom wall from cell above
+			current.setNextCell(new Cell(current.x, (current.y - 1)));
+			current = current.getNext();
+			grid[2 * (current.y + 2)][2 * (current.x + 1)] = "#";
+			grid[2 * (current.y + 1)][2 * (current.x + 1)] = "#";
+		} else if (random == 4) { //go left and delete right wall from left cell
+			current.setNextCell(new Cell(current.x - 1, current.y));
+			current = current.getNext();
+			grid[2 * (current.y + 1)][2 * (current.x +2)] = "#";
+			grid[2*(current.y+1)][2*(current.x+1)] = "#";
 		}
+		return current;
+
+	}
 
 	public void createPath(int r) {
 		gridlength = ((r * 2) + 1);
@@ -160,9 +181,10 @@ public class MazeGenerator {
 			c.neighbors.remove(this);
 		}
 
-		public void setNextCell() {
+		public void setNextCell(Cell node) {
 			this.node = node;
 		}
+
 		public Cell getNext() {
 			return node;
 		}
