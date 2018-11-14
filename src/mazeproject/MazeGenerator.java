@@ -8,7 +8,7 @@ import java.util.Stack;
 
 public class MazeGenerator {
 	private Random myRandGen;
-	private char[][] grid;
+	private String[][] grid;
 	private int gridlength;
 	Cell[][] cells;
 	private int cellCount;
@@ -18,53 +18,10 @@ public class MazeGenerator {
 	}
 
 	public MazeGenerator(int dimension_in) {
+		grid = new String[dimension_in][dimension_in];
+		gridlength = ((dimension_in * 2) + 1);
+		cellCount = dimension_in * dimension_in;
 		myRandGen = new java.util.Random(dimension_in);
-		/**
-		 * cellCount = r * r; grid = new char[(r * 2) + 1][(r * 2) + 1]; cells = new
-		 * Cell[r][r]; for (int i = 0; i < r; i++) { System.out.println(""); for (int j
-		 * = 0; j < r; j++) { System.out.print(j); cells[i][j] = new Cell(i, j); } } for
-		 * (int i = 0; i < r; i++) { for (int j = 0; j < r; j++) { if (j < r - 1) {
-		 * cells[i][j].addEdge(cells[i][j + 1]);// figure out why this doesnt go thru }
-		 * if (i < r - 1) { cells[i][j].addEdge(cells[i + 1][j]); }
-		 * 
-		 * }
-		 * 
-		 * } System.out.println(""); for (int l = 0; l < r; l++) { for (int i = 0; i <
-		 * r; i++) { System.out.print(cells[l][i].x); System.out.print(cells[l][i].y);
-		 * System.out.print(" "); } System.out.println(" "); } for (int l = 0; l < r;
-		 * l++) { for (int i = 0; i < r; i++) { System.out.print("+");
-		 * System.out.print("-"); } System.out.println("+"); for (int i = 0; i < r; i++)
-		 * { System.out.print("|"); System.out.print(" "); } System.out.print("|");
-		 * System.out.println(""); } for (int i = 0; i <= r; i++) {
-		 * System.out.print("+"); if (i < r) { System.out.print("-"); } }
-		 **/
-
-	}
-
-	public void createPath(int r) {
-		gridlength = ((r * 2) + 1);
-		cellCount = r * r;
-		grid = new char[(r * 2) + 1][(r * 2) + 1];
-		cells = new Cell[r][r];
-		for (int i = 0; i < r; i++) {
-			System.out.println("");
-			for (int j = 0; j < r; j++) {
-				System.out.print(j);
-				cells[i][j] = new Cell(i, j);
-			}
-		}
-		for (int i = 0; i < r; i++) {
-			for (int j = 0; j < r; j++) {
-				if (j < r - 1) {
-					cells[i][j].addEdge(cells[i][j + 1]);// figure out why this doesnt go thru
-				}
-				if (i < r - 1) {
-					cells[i][j].addEdge(cells[i + 1][j]);
-				}
-
-			}
-
-		}
 		Stack<Cell> cellStack = new Stack<Cell>();
 		ArrayList<Cell> intactCells = new ArrayList<Cell>();
 		int totalCells = cellCount;
@@ -87,16 +44,74 @@ public class MazeGenerator {
 				}
 			}
 
+		} /**
+			 * cellCount = r * r; grid = new char[(r * 2) + 1][(r * 2) + 1]; cells = new
+			 * Cell[r][r]; for (int i = 0; i < r; i++) { System.out.println(""); for (int j
+			 * = 0; j < r; j++) { System.out.print(j); cells[i][j] = new Cell(i, j); } } for
+			 * (int i = 0; i < r; i++) { for (int j = 0; j < r; j++) { if (j < r - 1) {
+			 * cells[i][j].addEdge(cells[i][j + 1]);// figure out why this doesnt go thru }
+			 * if (i < r - 1) { cells[i][j].addEdge(cells[i + 1][j]); }
+			 * 
+			 * }
+			 * 
+			 * } System.out.println(""); for (int l = 0; l < r; l++) { for (int i = 0; i <
+			 * r; i++) { System.out.print(cells[l][i].x); System.out.print(cells[l][i].y);
+			 * System.out.print(" "); } System.out.println(" "); } for (int l = 0; l < r;
+			 * l++) { for (int i = 0; i < r; i++) { System.out.print("+");
+			 * System.out.print("-"); } System.out.println("+"); for (int i = 0; i < r; i++)
+			 * { System.out.print("|"); System.out.print(" "); } System.out.print("|");
+			 * System.out.println(""); } for (int i = 0; i <= r; i++) {
+			 * System.out.print("+"); if (i < r) { System.out.print("-"); } }
+			 **/
+
+	}
+
+	public char[][] generate(char[][] grid) {
+		Stack<Cell> cellStack = new Stack<Cell>();
+		int totalCells = cellCount;
+		int visitedCells = 1;
+		Cell current = new Cell(0, 0);
+		while (visitedCells < totalCells) {
+			int j = (int) (myrandom() * intactCells.size());
 		}
+	}
+
+	public Cell path(String[][] grid, Cell current, int random) {
+		grid[1][1] = "#";
+		if(random == 1) {//go down
+			current.setNextCell(new Cell(current.x, current.y-1));
+		}
+
+	public void createPath(int r) {
+		gridlength = ((r * 2) + 1);
+		cellCount = r * r;
+		grid = new String[(r * 2) + 1][(r * 2) + 1];
+		cells = new Cell[r][r];
+		for (int i = 0; i < r; i++) {
+			System.out.println("");
+			for (int j = 0; j < r; j++) {
+				System.out.print(j);
+				cells[i][j] = new Cell(i, j);
+			}
+		}
+		/**
+		 * for (int i = 0; i < r; i++) { for (int j = 0; j < r; j++) { if (j < r - 1) {
+		 * cells[i][j].addEdge(cells[i][j + 1]);// figure out why this doesnt go thru }
+		 * if (i < r - 1) { cells[i][j].addEdge(cells[i + 1][j]); }
+		 * 
+		 * }
+		 * 
+		 * }
+		 **/
 		System.out.println("");
 		for (int l = 0; l < r; l++) {
 			System.out.print("|");
 			for (int i = 0; i < r; i++) {
-				if(i< r-1) {
-				System.out.print(cells[l][i].x);
-				System.out.print(cells[l][i].y);
-				if(cells[l][i].neighbors.contains(cells[l][i+1]))
-					System.out.print("|");
+				if (i < r - 1) {
+					System.out.print(cells[l][i].x);
+					System.out.print(cells[l][i].y);
+					if (cells[l][i].neighbors.contains(cells[l][i + 1]))
+						System.out.print("|");
 				}
 			}
 			System.out.println(" ");
@@ -123,15 +138,11 @@ public class MazeGenerator {
 	}
 
 	class Cell {
+		private Cell node;
 		private int x;
 		private int y;
-		private String character = " ";
-		private int color = WHITE;
 		private boolean intactWalls = true;
 		public LinkedList<Cell> neighbors;
-		public static final int WHITE = 0;
-		public static final int GREY = 1;
-		public static final int BLACK = 2;
 
 		public Cell(int x, int y) {
 			this.x = x;
@@ -143,14 +154,18 @@ public class MazeGenerator {
 			neighbors.add(c);
 			c.neighbors.add(this);
 		}
+
 		public void removeEdge(Cell c) {
 			neighbors.remove(c);
 			c.neighbors.remove(this);
 		}
 
-	}
-
-	class Graph {
+		public void setNextCell() {
+			this.node = node;
+		}
+		public Cell getNext() {
+			return node;
+		}
 
 	}
 
