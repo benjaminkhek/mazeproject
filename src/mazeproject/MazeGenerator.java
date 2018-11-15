@@ -16,6 +16,7 @@ public class MazeGenerator {
 		return myRandGen.nextDouble(); // random in 0-1
 	}
 
+
 	public MazeGenerator(int dimension_in) {
 		grid = new String[dimension_in][dimension_in];
 		gridlength = ((dimension_in * 2) + 1);
@@ -24,6 +25,15 @@ public class MazeGenerator {
 		cells = new Cell[dimension_in][dimension_in];
 
 	}
+
+
+	/**
+	public MazeGenerator(int size) {	
+		grid = new String[2 * size + 1][2 * size + 1];
+	}
+	*/
+	
+	//generates starting maze
 
 	public String[][] maze(int mazeSize) {
 		int n = 2 * mazeSize + 1;
@@ -34,22 +44,25 @@ public class MazeGenerator {
 			for (int colIndex = 0; colIndex < m; colIndex++) {
 				if (rowIndex == 0 && colIndex == 1) {
 					grid[rowIndex][colIndex] = "S"; // Start
-				} else if (rowIndex == 2 * mazeSize - 1 && colIndex == 2 * mazeSize) {
+				} else if (rowIndex == 2 * mazeSize && colIndex == 2 * mazeSize - 1) {
 					grid[rowIndex][colIndex] = "E"; // End
 				}
-				// evens
+				// evens rows
 				else if (rowIndex % 2 == 0) {
+					// even columns
 					if (colIndex % 2 == 0) {
 						grid[rowIndex][colIndex] = "+";
 					} else {
-						grid[rowIndex][colIndex] = "|";
+						grid[rowIndex][colIndex] = "-";
 					}
 				}
-				// odds
+				// odds rows
 				else {
+					//even columns
 					if (colIndex % 2 == 0) {
-						grid[rowIndex][colIndex] = "-";
-					} else {
+						grid[rowIndex][colIndex] = "|";
+					} 
+					else {
 						grid[rowIndex][colIndex] = "0";
 					}
 				}
@@ -81,6 +94,41 @@ public class MazeGenerator {
 		return grid;
 	}
 
+	
+	public String convert(String[][] grid) {
+		String maze = "";
+		int size = grid.length;
+		
+		for(int rowIndex = 0; rowIndex < size; rowIndex++) {
+			for(int colIndex = 0; colIndex < size; colIndex++) {
+				if(grid[rowIndex][colIndex] == "+") {
+					maze = maze + "+";
+				}
+				else if(grid[rowIndex][colIndex] == "-") {
+					maze = maze + "-";
+				}
+				else if(grid[rowIndex][colIndex] == "|") {
+					maze = maze + "|";
+				}
+				else if(grid[rowIndex][colIndex] == "S" || grid[rowIndex][colIndex] == "E") {
+					maze = maze + " ";
+				}
+				else {
+					maze = maze + " " + grid[rowIndex][colIndex] + " ";
+				}
+				/**
+				if(rowIndex == (size - 1) && colIndex != (size - 1)) {
+					maze = maze + System.lineSeparator();
+				}
+				*/
+			}
+		}
+		
+		return maze;
+		
+		
+	}
+
 	public void knockWall(Cell current, Cell next) {
 		if (next.x > current.x) {
 			// knock down left wall of next
@@ -108,6 +156,7 @@ public class MazeGenerator {
 			}
 		}
 	}
+	
 	/**
 	 * Initializes all cells
 	 */
