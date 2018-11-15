@@ -62,7 +62,7 @@ public class MazeGenerator {
 		Stack<Cell> cellStack = new Stack<Cell>();
 		int visitedCells = 1;
 		Cell current = cells[0][0];
-		grid[1][1] = "#";
+		grid[1][1] = " ";
 		while (visitedCells < cellCount) {
 			ArrayList<Cell> intactCells = new ArrayList<Cell>();
 			for (Cell c : current.neighbors) {
@@ -79,7 +79,8 @@ public class MazeGenerator {
 				current = toKnock; // current cell is now the one that just had its walls knocked down
 				visitedCells++;
 			} else {
-				current = cellStack.pop(); // pop most recent cell and make it the current cell
+				current = cellStack.peek(); // pop most recent cell and make it the current cell
+				cellStack.pop();
 			}
 		}
 
@@ -94,22 +95,22 @@ public class MazeGenerator {
 	public void knockWall(Cell current, Cell next) {
 		current.intactWalls = false;
 		next.intactWalls = false;
-		grid[2*next.y + 1][2*next.x + 1] = "#";
+		grid[2*next.y + 1][2*next.x + 1] = " ";
 		if (next.x > current.x) {
 			// knock down left wall of next
-			grid[2 * next.y + 1][2 * next.x] = "#";
+			grid[2 * next.y + 1][2 * next.x] = " ";
 		}
 		if (next.x < current.x) {
 			// knock down right wall of next
-			grid[2 * next.y + 1][2 * next.x + 2] = "#";
+			grid[2 * next.y + 1][2 * next.x + 2] = " ";
 		}
 		if (next.y < current.y) {
 			// knock down bottom wall of next
-			grid[2 * next.y + 2][2 * next.x + 1] = "#";
+			grid[2 * next.y + 2][2 * next.x + 1] = " ";
 		}
 		if (next.y > current.y) {
 			// knock down top wall of next
-			grid[2 * next.y][2 * next.x + 1] = "#";
+			grid[2 * next.y][2 * next.x + 1] = " ";
 		}
 	}
 
@@ -122,6 +123,14 @@ public class MazeGenerator {
 				}
 				if (i != cells.length - 1) {
 					cells[i][j].addNeighbor(cells[i + 1][j]);
+				}
+				if(i != 0)
+				{
+					cells[i][j].addNeighbor(cells[i -1][j]);
+				}
+				if(j!= 0)
+				{
+					cells[i][j].addNeighbor(cells[i][j-1]);
 				}
 			}
 		}
