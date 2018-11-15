@@ -12,7 +12,7 @@ class MazeGeneratorTest {
 		
 		System.out.println(mg.convert(mazeConverted));
 		**/
-		MazeGenerator mg = new MazeGenerator(5);
+		MazeGenerator mg = new MazeGenerator(4);
 		String[][] maze = mg.maze(4);
 		for(int i = 0; i < maze.length; i++){//Print out an unfinished maze.
 			for(int j = 0; j < maze.length; j++) {
