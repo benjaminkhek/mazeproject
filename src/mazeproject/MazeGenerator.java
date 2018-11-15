@@ -56,7 +56,7 @@ public class MazeGenerator {
 			}
 		}
 
-		Stack<Cell> cellStack = new Stack<Cell>();
+		/**Stack<Cell> cellStack = new Stack<Cell>();
 		int totalCells = cellCount;
 		int visitedCells = 1;
 		Cell current = new Cell(0, 0);
@@ -77,6 +77,7 @@ public class MazeGenerator {
 				current = cellStack.pop(); // pop most recent cell and make it the current cell
 			}
 		}
+		**/
 		return grid;
 	}
 
@@ -94,7 +95,6 @@ public class MazeGenerator {
 			// knock down top wall of next
 		}
 	}
-
 	public void findNeighbors() {
 		for (int i = 0; i <= grid.length - 1; i++) {
 
@@ -108,7 +108,9 @@ public class MazeGenerator {
 			}
 		}
 	}
-
+	/**
+	 * Initializes all cells
+	 */
 	public void initializeCells() {
 		for (int i = 0; i <= grid.length - 1; i++) {
 
@@ -231,6 +233,7 @@ public class MazeGenerator {
 		private int y;
 		private boolean intactWalls = true;
 		public LinkedList<Cell> neighbors;
+		public String character = " ";
 
 		public Cell(int y, int x) {
 			this.x = x;
