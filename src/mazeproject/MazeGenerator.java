@@ -99,7 +99,7 @@ public class MazeGenerator {
 				}
 			}
 		}
-/**
+		//Create the actual maze using DFS
 		Stack<Cell> cellStack = new Stack<Cell>();
 		int totalCells = cellCount;
 		int visitedCells = 1;
@@ -124,7 +124,7 @@ public class MazeGenerator {
 				current = cellStack.pop(); // pop most recent cell and make it the current cell
 			}
 		}
-		**/
+		
 		return grid;
 	}
 
