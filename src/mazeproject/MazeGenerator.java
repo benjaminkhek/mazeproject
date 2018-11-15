@@ -16,29 +16,19 @@ public class MazeGenerator {
 		return myRandGen.nextDouble(); // random in 0-1
 	}
 
-
 	public MazeGenerator(int dimension_in) {
-		grid = new String[dimension_in][dimension_in];
-		gridlength = ((dimension_in * 2) + 1);
-		cellCount = dimension_in * dimension_in;
+
 		myRandGen = new java.util.Random(0);
-		cells = new Cell[dimension_in][dimension_in];
 
 	}
-
-
-	/**
-	public MazeGenerator(int size) {	
-		grid = new String[2 * size + 1][2 * size + 1];
-	}
-	*/
-	
-	//generates starting maze
 
 	public String[][] maze(int mazeSize) {
+		cellCount = mazeSize * mazeSize;
 		int n = 2 * mazeSize + 1;
 		int m = 2 * mazeSize + 1;
-		String[][] grid = new String[n][m];
+		gridlength = n;
+		grid = new String[n][m];
+		cells = new Cell[mazeSize][mazeSize];
 
 		for (int rowIndex = 0; rowIndex < n; rowIndex++) {
 			for (int colIndex = 0; colIndex < m; colIndex++) {
@@ -58,112 +48,134 @@ public class MazeGenerator {
 				}
 				// odds rows
 				else {
-					//even columns
+					// even columns
 					if (colIndex % 2 == 0) {
 						grid[rowIndex][colIndex] = "|";
-					} 
-					else {
-						grid[rowIndex][colIndex] = "0";
+					} else {
+						grid[rowIndex][colIndex] = " ";
 					}
 				}
 			}
 		}
-
-		/**Stack<Cell> cellStack = new Stack<Cell>();
-		int totalCells = cellCount;
+		initializeCells();
+		// Create the actual maze using DFS
+		Stack<Cell> cellStack = new Stack<Cell>();
 		int visitedCells = 1;
-		Cell current = new Cell(0, 0);
-		while (visitedCells < totalCells) {
+		Cell current = cells[0][0];
+		grid[1][1] = " ";
+		while (visitedCells < cellCount) {
 			ArrayList<Cell> intactCells = new ArrayList<Cell>();
 			for (Cell c : current.neighbors) {
 				if (c.intactWalls) {
 					intactCells.add(c);// adds intactCells to the arrayList
 				}
 			}
+
 			if (intactCells.size() > 1) {
 				int j = (int) (myrandom() * intactCells.size());// chooses a random cell from intact neighbors
 				Cell toKnock = intactCells.get(j);
-				knockWall(current, toKnock);// knock down wall between current and toKnock
+				grid[2 * toKnock.y + 1][2 * toKnock.x + 1] = " ";
+				editWall(current, toKnock, " ");// knock down wall between current and toKnock
+				cellStack.push(current);
 				current = toKnock; // current cell is now the one that just had its walls knocked down
 				visitedCells++;
 			} else {
-				current = cellStack.pop(); // pop most recent cell and make it the current cell
+				current = cellStack.peek(); // pop most recent cell and make it the current cell
+				cellStack.pop();
 			}
 		}
-		**/
+
 		return grid;
 	}
 
-	
-	public String convert(String[][] grid) {
-		String maze = "";
-		int size = grid.length;
-		
-		for(int rowIndex = 0; rowIndex < size; rowIndex++) {
-			for(int colIndex = 0; colIndex < size; colIndex++) {
-				if(grid[rowIndex][colIndex] == "+") {
-					maze = maze + "+";
-				}
-				else if(grid[rowIndex][colIndex] == "-") {
-					maze = maze + "-";
-				}
-				else if(grid[rowIndex][colIndex] == "|") {
-					maze = maze + "|";
-				}
-				else if(grid[rowIndex][colIndex] == "S" || grid[rowIndex][colIndex] == "E") {
-					maze = maze + " ";
-				}
-				else {
-					maze = maze + " " + grid[rowIndex][colIndex] + " ";
-				}
-				/**
-				if(rowIndex == (size - 1) && colIndex != (size - 1)) {
-					maze = maze + System.lineSeparator();
-				}
-				*/
-			}
-		}
-		
-		return maze;
-		
-		
-	}
-
-	public void knockWall(Cell current, Cell next) {
+	/**
+	 * Knocks down a wall between current and next.
+	 * 
+	 * @param current
+	 *            The current Cell that has a wall between it and next
+	 * @param next
+	 *            A cell that is an intact neighbor of current.
+	 */
+	public void editWall(Cell current, Cell next, String r) {
+		current.intactWalls = false;
+		next.intactWalls = false;
 		if (next.x > current.x) {
 			// knock down left wall of next
+			grid[2 * next.y + 1][2 * next.x] = r;
 		}
 		if (next.x < current.x) {
 			// knock down right wall of next
+			grid[2 * next.y + 1][2 * next.x + 2] = r;
 		}
 		if (next.y < current.y) {
 			// knock down bottom wall of next
+			grid[2 * next.y + 2][2 * next.x + 1] = r;
 		}
 		if (next.y > current.y) {
 			// knock down top wall of next
+			grid[2 * next.y][2 * next.x + 1] = r;
 		}
 	}
-	public void findNeighbors() {
-		for (int i = 0; i <= grid.length - 1; i++) {
 
-			for (int j = 0; j <= grid.length - 1; j++) {
-				if (j != grid.length - 1) {
-					cells[i][j].addEdge(cells[i][j + 1]);
+	public String[][] DFSSolve(String[][] grid) {
+		String[][] dfsGrid = grid.clone();
+		Stack<Cell> cellStack = new Stack<Cell>();
+		int visitedCells = 1;
+		Cell current = cells[0][0];
+		grid[1][1] = "0";
+		Integer r = 1;
+		while (visitedCells < cellCount) {
+			ArrayList<Cell> openCells = new ArrayList<Cell>();
+			for (Cell c : current.neighbors) {
+				if (!c.intactWalls) {
+					openCells.add(c);// adds openCells to the arrayList
 				}
-				if (i != grid.length - 1) {
-					cells[i][j].addEdge(cells[i + 1][j]);
+			}
+
+			if (openCells.size() > 1) {
+				int j = (int) (myrandom() * openCells.size());// chooses a random cell from open
+				Cell toKnock = openCells.get(j);
+				grid[2 * toKnock.y + 1][2 * toKnock.x + 1] = r.toString();
+				editWall(current, toKnock, r.toString());// adds number between 2 Cells
+				r++;
+				cellStack.push(current);
+				current = toKnock; // current cell is now the one that just had its walls knocked down
+				visitedCells++;
+			} else {
+				current = cellStack.peek(); // pop most recent cell and make it the current cell
+				cellStack.pop();
+			}
+		}
+		return dfsGrid;
+	}
+
+	public void findNeighbors() {
+		for (int i = 0; i <= cells.length - 1; i++) {
+
+			for (int j = 0; j <= cells.length - 1; j++) {
+				if (j != cells.length - 1) {
+					cells[i][j].addNeighbor(cells[i][j + 1]);
+				}
+				if (i != cells.length - 1) {
+					cells[i][j].addNeighbor(cells[i + 1][j]);
+				}
+				if (i != 0) {
+					cells[i][j].addNeighbor(cells[i - 1][j]);
+				}
+				if (j != 0) {
+					cells[i][j].addNeighbor(cells[i][j - 1]);
 				}
 			}
 		}
 	}
-	
+
 	/**
 	 * Initializes all cells
 	 */
 	public void initializeCells() {
-		for (int i = 0; i <= grid.length - 1; i++) {
+		for (int i = 0; i < cells.length; i++) {
 
-			for (int j = 0; j <= grid.length - 1; j++) {
+			for (int j = 0; j < cells.length; j++) {
 				cells[i][j] = new Cell(i, j);
 
 			}
@@ -171,142 +183,21 @@ public class MazeGenerator {
 		findNeighbors();
 	}
 
-	/**
-	 * 
-	 * public String[][] generate(String[][] grid) { Stack<Cell> cellStack = new
-	 * Stack<Cell>(); int totalCells = cellCount; int visitedCells = 1; Cell current
-	 * = new Cell(0, 0); while (visitedCells < totalCells) { int j = (int)
-	 * (myrandom() * current.neighbors.size() -1); current = path(grid, current, j);
-	 * visitedCells = visitedCells + 1; cellStack.push(current); } return grid; }
-	 */
-	public int test() {
-		int j = (int) (myrandom() * 2);
-		System.out.println(j);
-		j = (int) (myrandom() * 4);
-		System.out.println(j);
-		return j;
-	}
-
-	public boolean intact(Cell c) {
-		if (grid[c.x][c.y].equals("#")) {
-			return false;
-		}
-		return true;
-	}
-
-	public Cell path(String[][] grid, Cell current, int random) {
-		grid[1][1] = "#";
-		if (random == 1) {// go down and delete top wall from cell below
-			current.setNextCell(new Cell(current.x, current.y + 1));
-			current = current.getNext();
-			grid[2 * (current.y)][2 * (current.x + 1)] = "#";
-		} else if (random == 2)// go right and delete left wall from cell to the right
-		{
-			current.setNextCell(new Cell(current.x + 1, current.y));
-			current = current.getNext();
-			grid[2 * (current.y + 1)][2 * current.x] = "#";
-			grid[2 * (current.y + 1)][2 * (current.x + 1)] = "#";
-		} else if (random == 3) {// go up and delete bottom wall from cell above
-			current.setNextCell(new Cell(current.x, (current.y - 1)));
-			current = current.getNext();
-			grid[2 * (current.y + 2)][2 * (current.x + 1)] = "#";
-			grid[2 * (current.y + 1)][2 * (current.x + 1)] = "#";
-		} else if (random == 4) { // go left and delete right wall from left cell
-			current.setNextCell(new Cell(current.x - 1, current.y));
-			current = current.getNext();
-			grid[2 * (current.y + 1)][2 * (current.x + 2)] = "#";
-			grid[2 * (current.y + 1)][2 * (current.x + 1)] = "#";
-		}
-		return current;
-
-	}
-
-	public void createPath(int r) {
-		gridlength = ((r * 2) + 1);
-		cellCount = r * r;
-		grid = new String[(r * 2) + 1][(r * 2) + 1];
-		cells = new Cell[r][r];
-		for (int i = 0; i < r; i++) {
-			System.out.println("");
-			for (int j = 0; j < r; j++) {
-				System.out.print(j);
-				cells[i][j] = new Cell(i, j);
-			}
-		}
-		/**
-		 * for (int i = 0; i < r; i++) { for (int j = 0; j < r; j++) { if (j < r - 1) {
-		 * cells[i][j].addEdge(cells[i][j + 1]);// figure out why this doesnt go thru }
-		 * if (i < r - 1) { cells[i][j].addEdge(cells[i + 1][j]); }
-		 * 
-		 * }
-		 * 
-		 * }
-		 **/
-		System.out.println("");
-		for (int l = 0; l < r; l++) {
-			System.out.print("|");
-			for (int i = 0; i < r; i++) {
-				if (i < r - 1) {
-					System.out.print(cells[l][i].x);
-					System.out.print(cells[l][i].y);
-					if (cells[l][i].neighbors.contains(cells[l][i + 1]))
-						System.out.print("|");
-				}
-			}
-			System.out.println(" ");
-		}
-		for (int l = 0; l < r; l++) {
-			for (int i = 0; i < r; i++) {
-				System.out.print("+");
-				System.out.print("-");
-			}
-			System.out.println("+");
-			for (int i = 0; i < r; i++) {
-				System.out.print("|");
-				System.out.print(" ");
-			}
-			System.out.print("|");
-			System.out.println("");
-		}
-		for (int i = 0; i <= r; i++) {
-			System.out.print("+");
-			if (i < r) {
-				System.out.print("-");
-			}
-		}
-	}
-
 	class Cell {
-		private Cell node;
 		private int x;
 		private int y;
 		private boolean intactWalls = true;
 		public LinkedList<Cell> neighbors;
-		public String character = " ";
 
-		public Cell(int y, int x) {
+		public Cell(int x, int y) {
 			this.x = x;
 			this.y = y;
 			neighbors = new LinkedList<Cell>();
 		}
 
-		public void addEdge(Cell c) {
+		public void addNeighbor(Cell c) {
 			neighbors.add(c);
 			c.neighbors.add(this);
-		}
-
-		public void removeEdge(Cell c) {
-			neighbors.remove(c);
-			c.neighbors.remove(this);
-		}
-
-		public void setNextCell(Cell node) {
-			this.node = node;
-			neighbors.add(node);
-		}
-
-		public Cell getNext() {
-			return node;
 		}
 
 	}
