@@ -1,10 +1,6 @@
 package mazeproject;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Random;
-import java.util.Stack;
+import java.util.*;
 
 public class MazeGenerator {
 	private Random myRandGen;
@@ -12,16 +8,30 @@ public class MazeGenerator {
 	Cell[][] cells;
 	private int cellCount;
 
+	/**
+	 * Used to choose a random number in order to remove walls
+	 * @return
+	 */
 	public double myrandom() {
 		return myRandGen.nextDouble(); // random in 0-1
 	}
 
+	/**
+	 * Helps in the creation of creating a random maze using a different seed for 
+	 * removing walls
+	 * @param dimension_in
+	 */
 	public MazeGenerator(int dimension_in) {
 
 		myRandGen = new java.util.Random(1);
 
 	}
 
+	/**
+	 * Generates a maze of mazeSize x mazeSize
+	 * @param mazeSize
+	 * @return
+	 */
 	public String[][] maze(int mazeSize) {
 		cellCount = mazeSize * mazeSize;
 		int n = 2 * mazeSize + 1;
@@ -89,26 +99,6 @@ public class MazeGenerator {
 		return grid;
 	}
 
-	public boolean pathBetween(Cell current, Cell next, String[][] grid) {
-		if (next.x > current.x && grid[2 * next.y + 1][2 * next.x] == " ") {
-			// path to the left of cell one
-			return true;
-		}
-		if (next.x < current.x && grid[2 * next.y + 1][2 * next.x + 2] == " ") {
-			// path to the right of cell one
-			return true;
-		}
-		if (next.y < current.y && grid[2 * next.y + 2][2 * next.x + 1] == " ") {
-			// knock down bottom wall of next
-			return true;
-		}
-		if (next.y > current.y && grid[2 * next.y][2 * next.x + 1] == " ") {
-			// knock down top wall of next
-			return true;
-		}
-		return false;
-	}
-
 	/**
 	 * Solves a given maze using DFS
 	 * 
@@ -116,7 +106,7 @@ public class MazeGenerator {
 	 * @return
 	 */
 	public String[][] DFSSolve(String[][] grid) {
-		initializeCells();
+		initializeCells(); // initializes Cells for DFS
 		String[][] dfsGrid = new String[grid.length][grid.length];
 		dfsGrid = grid.clone(); // copy the grid
 		Stack<Cell> cellStack = new Stack<Cell>(); // A stack to keep track of visited cells
@@ -158,41 +148,63 @@ public class MazeGenerator {
 		}
 		return dfsGrid;
 	}
-	public String[][] BFSSolve(String[][] grid) {
-		initializeBFSCells();
-		String[][] bfsGrid = grid.clone();
-		Queue<Cell> queue = new LinkedList<>();
-		Cell current = cells[0][0];
-		bfsGrid[1][1] = "0";
-		Integer r = 1;
-		queue.add(current);
 
+	/**
+	 * Solves the maze using BFS
+	 * 
+	 * @param grid
+	 * @return
+	 */
+	public String[][] BFSSolve(String[][] grid) {
+		initializeBFSCells(); // initializes Cells for BFS
+		String[][] bfsGrid = grid.clone();
+		Queue<Cell> queue = new LinkedList<>(); // creates a queue to add in
+		Cell current = cells[0][0]; // sets the beginning cell of the search
+		bfsGrid[1][1] = "0"; // sets the beginning cell in the maze as the start (0th search)
+		Integer r = 1; // Keeps track of which cell is discovered in the search
+		queue.add(current); // adds the first cell into the queue to be discovered
+
+		// loops through to add cells into the queue that can be discovered if there is
+		// a path
+		// between them
 		while (!queue.isEmpty()) {
+			// checks every neighbor in the "current" cell
 			for (Cell c : current.neighbors) {
+				// checks to see if there is a path the current cell and each of the neighbors
+				// if there is a path between the two, add to the queue
 				if (pathBFS(current, c, grid)) {
 					queue.add(c);
-					if(c.parent == null) {
-					c.parent = current;
+					// checks if the parent is null before adding its making current c's parent
+					// so as to not overwrite the parent and create a loop of constantly rewriting
+					// the parent;
+					if (c.parent == null) {
+						c.parent = current;
 					}
+					// makes sure that the queue doesn't include so it doesn't discover backwards
 					if (queue.contains(current.parent)) {
 						queue.remove(current.parent);
 					}
 				}
 			}
+
+			// Checks to see if the queue isn't null
 			if (queue.peek() != null) {
-				queue.remove();
-				Cell next = queue.peek();
-				bfsGrid[2 * next.x + 1][2 * next.y + 1] = r.toString();
-				r = increment(r);
-				edit(bfsGrid, current, next, "#");
-				current = next;
+				queue.remove(); // removes the top of the queue
+				Cell next = queue.peek(); // looks at the next in queue
+				bfsGrid[2 * next.x + 1][2 * next.y + 1] = r.toString(); // sets the next cell with an integer showing
+																		// its discovery time
+				r = increment(r); // increments the integer for discovery time
+				edit(bfsGrid, current, next, "#"); // adds a "#" in between the cell locations to show the path
+				current = next; // sets current as next
 			}
+			// if current reaches the end of the cells, break out of the loop
 			if (current == cells[cells.length - 1][cells.length - 1]) {
 				break;
 			}
 
 		}
 
+		// Removes the "#" in the BFS maze as to only leave the numbers of discovery in
 		for (int i = 0; i < bfsGrid.length; i++) {
 			for (int j = 0; j < bfsGrid.length; j++) {
 				if (bfsGrid[i][j] == "#") {
@@ -203,60 +215,16 @@ public class MazeGenerator {
 
 		return bfsGrid;
 	}
-	//maybe use these as ideas im not sure
-	
-	/**public String[][] BFSSolve(String[][] grid) {
-		String[][] bfsGrid = grid.clone();
-		for(int i = 0; i <  bfsGrid.length; i++){//Print out a maze solved using DFS
-			for(int j = 0; j <  bfsGrid.length; j++) {
-				System.out.print(bfsGrid[i][j]);
-				if(j == bfsGrid.length - 1) {
-					System.out.println("");
-				}
-			}
-		}
-		Queue<Cell> queue = new LinkedList<>();
-		Cell current = cells[0][0];
-		bfsGrid[1][1] = "0";
-		current.order = 0;
-		current.done = true;
-		queue.add(current);
 
-		while (current != cells[cells.length - 1][cells.length - 1]) {
-			current = queue.remove();
-			for (Cell c : current.neighbors) {
-				if (pathBFS(c, current, bfsGrid)) {
-					c.done = true;
-					c.parent = current;
-					c.order = increment(current.order);
-					queue.add(c);
-					bfsGrid[2 * c.x + 1][2 * c.y + 1] = c.order.toString();
-					edit(bfsGrid, current, c, "#");
-					current = c;
-				}
-
-			}
-			/**if (queue.peek() != null) {
-				Cell next = queue.peek();
-				queue.remove();
-				bfsGrid[2 * next.y + 1][2 * next.x + 1] = next.order.toString();
-				edit(bfsGrid, current, next, "#");
-				current = next;
-				if (current == cells[cells.length - 1][cells.length - 1]) {
-					break;
-				}
-			}
-
-		for (int i = 0; i < bfsGrid.length; i++) {
-			for (int j = 0; j < bfsGrid.length; j++) {
-				if (bfsGrid[i][j] == "#") {
-					bfsGrid[i][j] = " ";
-				}
-			}
-		}
-
-		return bfsGrid;
-	*/
+	/**
+	 * Used in the BFS method in order to check whether or not there is a space
+	 * between the current and next cell
+	 * 
+	 * @param current
+	 * @param next
+	 * @param grid
+	 * @return
+	 */
 	public boolean pathBFS(Cell current, Cell next, String[][] grid) {
 		if (next.x > current.x && grid[2 * next.x][2 * next.y + 1] == " ") {
 			// path below of current is true
@@ -277,12 +245,10 @@ public class MazeGenerator {
 		return false;
 	}
 
-
 	/**
 	 * Converts the given solvedMaze to be one with #'s to denote the shortest path
 	 * 
-	 * @param grid
-	 *            A solved grid
+	 * @param grid A solved grid
 	 * @return A grid that has the shortest path denoted with "#"s
 	 */
 	public String[][] path(String[][] grid) {
@@ -290,7 +256,8 @@ public class MazeGenerator {
 		pathGrid = grid.clone();
 		Cell[][] dfsCells = new Cell[cells.length][cells.length];
 		dfsCells = cells.clone();
-		Cell current = dfsCells[dfsCells.length - 1][dfsCells.length - 1];// start from the ending cell and work our way back
+		Cell current = dfsCells[dfsCells.length - 1][dfsCells.length - 1];// start from the ending cell and work our way
+																			// back
 		pathGrid[1][1] = "#";
 		while (current != dfsCells[0][0]) {// this loop will run until we come back to the start
 			pathGrid[2 * current.y + 1][2 * current.x + 1] = "#";// marks current
@@ -309,12 +276,20 @@ public class MazeGenerator {
 		return pathGrid;
 
 	}
-	
+
+	/**
+	 * Used for the BFS method in order to backtrack through the parents of the
+	 * cells denoting them with a "#" in order to show the shortest path
+	 * 
+	 * @param grid
+	 * @return
+	 */
 	public String[][] backTrack(String[][] grid) {
 		String[][] pathGrid = grid.clone();
 		Cell[][] bfsCells = new Cell[cells.length][cells.length];
 		bfsCells = cells.clone();
-		Cell current = bfsCells[bfsCells.length - 1][bfsCells.length - 1];// start from the ending cell and work our way back
+		Cell current = bfsCells[bfsCells.length - 1][bfsCells.length - 1];// start from the ending cell and work our way
+																			// back
 		pathGrid[1][1] = "#";
 		while (current != bfsCells[0][0]) {// this loop will run until we come back to the start
 			pathGrid[2 * current.x + 1][2 * current.y + 1] = "#";// marks current
@@ -348,6 +323,15 @@ public class MazeGenerator {
 		return r;
 	}
 
+	/**
+	 * Edits the wall between the current and next cell in the BFS method with
+	 * String r
+	 * 
+	 * @param grid
+	 * @param current
+	 * @param next
+	 * @param r
+	 */
 	public void edit(String[][] grid, Cell current, Cell next, String r) {
 		if (next.x > current.x && grid[2 * next.x][2 * next.y + 1] == " ") {
 			// edit bottom wall of current
@@ -370,10 +354,8 @@ public class MazeGenerator {
 	/**
 	 * Edits a wall between current and next.
 	 * 
-	 * @param current
-	 *            The current Cell that has a wall between it and next
-	 * @param next
-	 *            A cell that is an intact neighbor of current.
+	 * @param current The current Cell that has a wall between it and next
+	 * @param next    A cell that is an intact neighbor of current.
 	 */
 	public void editWall(String[][] thisgrid, Cell current, Cell next, String r) {
 		if (next.x > current.x) {
@@ -393,6 +375,35 @@ public class MazeGenerator {
 			thisgrid[2 * next.y][2 * next.x + 1] = r.toString();
 		}
 	}
+
+	/**
+	 * Checks to see if there is a path between the current and next cell in the creation of the 
+	 * maze.
+	 * @param current
+	 * @param next
+	 * @param grid
+	 * @return
+	 */
+	public boolean pathBetween(Cell current, Cell next, String[][] grid) {
+		if (next.x > current.x && grid[2 * next.y + 1][2 * next.x] == " ") {
+			// path to the left of cell one
+			return true;
+		}
+		if (next.x < current.x && grid[2 * next.y + 1][2 * next.x + 2] == " ") {
+			// path to the right of cell one
+			return true;
+		}
+		if (next.y < current.y && grid[2 * next.y + 2][2 * next.x + 1] == " ") {
+			// knock down bottom wall of next
+			return true;
+		}
+		if (next.y > current.y && grid[2 * next.y][2 * next.x + 1] == " ") {
+			// knock down top wall of next
+			return true;
+		}
+		return false;
+	}
+
 	/**
 	 * Finds the neighbors of every cell in cells and then adds them to their
 	 * adjacency list
@@ -416,7 +427,11 @@ public class MazeGenerator {
 			}
 		}
 	}
-	
+
+	/**
+	 * Finds each neighbor and adds it to their adjacency list but only through a
+	 * singly linked list
+	 */
 	public void findBFSNeighbors() {
 		for (int i = 0; i <= cells.length - 1; i++) {
 
@@ -450,7 +465,11 @@ public class MazeGenerator {
 		}
 		findNeighbors();
 	}
-	
+
+	/**
+	 * Initializes the cells for the BFS method with a singly linked list of
+	 * neighbors
+	 */
 	public void initializeBFSCells() {
 		for (int i = 0; i < cells.length; i++) {
 
@@ -462,6 +481,10 @@ public class MazeGenerator {
 		findBFSNeighbors();
 	}
 
+	/**
+	 * Cell class to hold a variety of properties: -x and y position -it's parent
+	 * -checking for intact walls -adjacency list of neighbors
+	 */
 	class Cell {
 		private int x;
 		private int y;
@@ -479,7 +502,7 @@ public class MazeGenerator {
 			neighbors.add(c);
 			c.neighbors.add(this);
 		}
-		
+
 		public void addNeighborBFS(Cell c) {
 			neighbors.add(c);
 		}
