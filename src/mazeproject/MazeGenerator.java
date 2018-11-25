@@ -30,7 +30,7 @@ public class MazeGenerator {
 	/**
 	 * Generates a maze of mazeSize x mazeSize
 	 * @param mazeSize
-	 * @return
+	 * @return the maze created
 	 */
 	public String[][] maze(int mazeSize) {
 		cellCount = mazeSize * mazeSize;
@@ -102,8 +102,8 @@ public class MazeGenerator {
 	/**
 	 * Solves a given maze using DFS
 	 * 
-	 * @param grid
-	 * @return
+	 * @param grid the grid that is to be solved
+	 * @return the grid that is solved in DFS  with numbers showing order of steps taken
 	 */
 	public String[][] DFSSolve(String[][] grid) {
 		initializeCells(); // initializes Cells for DFS
@@ -312,7 +312,7 @@ public class MazeGenerator {
 	 * increments r and resets it back to 0 if it hits then for use in DFSSolve and
 	 * BFSSolve
 	 * 
-	 * @param r
+	 * @param r the integer that is between 0-9
 	 * @return
 	 */
 	public Integer increment(Integer r) {
@@ -381,8 +381,8 @@ public class MazeGenerator {
 	 * maze.
 	 * @param current
 	 * @param next
-	 * @param grid
-	 * @return
+	 * @param grid the grid in which to check for a path
+	 * @return whether or not the path exists
 	 */
 	public boolean pathBetween(Cell current, Cell next, String[][] grid) {
 		if (next.x > current.x && grid[2 * next.y + 1][2 * next.x] == " ") {
